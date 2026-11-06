@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101b32">
+<meta name="description" content="A polished, fully offline classic Snakes and Ladders game.">
+<title>Snakes & Ladders — Classic Edition</title>
+<style>
+:root{color-scheme:light;--ink:#17243a;--muted:#64748b;--navy:#14213d;--navy2:#203653;--paper:#fbfaf7;--line:#e4e7ec;--accent:#b78b45;--green:#27856c;--red:#d65b52}
+*{box-sizing:border-box}html{min-width:320px}body{margin:0;background:radial-gradient(ellipse at 15% 0%,#304763 0,#17263d 48%,#101827 100%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);min-height:100vh}
+button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #c99a4e;outline-offset:2px}
+.shell{max-width:1240px;margin:0 auto;padding:max(22px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(30px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left))}.brand{text-align:center;color:#fff;margin:0 0 20px}.eyebrow{text-transform:uppercase;letter-spacing:.2em;font-size:10px;font-weight:800;color:#d6bd91}.brand h1{font-family:Georgia,serif;font-weight:600;letter-spacing:.01em;font-size:clamp(30px,5vw,46px);margin:5px 0 4px}.brand p{color:#d2dbe7;font-size:13px;margin:0}
+.workspace{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.8fr);gap:18px;align-items:start}.surface{background:var(--paper);border:1px solid #e8e2d7;border-radius:20px;box-shadow:0 18px 50px #050b1690;padding:16px}.board-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 2px 12px}.board-title{font-weight:800;font-size:14px}.board-subtitle{font-size:12px;color:var(--muted);margin-top:2px}.badge{border:1px solid #e6d8bd;background:#f7f0e4;color:#72552a;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800;white-space:nowrap}
+.board-wrap{position:relative;width:100%;max-width:760px;margin:auto;aspect-ratio:10/10}.board{display:grid;width:100%;height:100%;border:5px solid #263750;border-radius:12px;overflow:hidden;background:#fff;box-shadow:inset 0 0 0 1px #fff}.cell{position:relative;min-width:0;min-height:0;border:1px solid #d9dedf;padding:3px;display:flex;align-items:flex-start;font-size:clamp(7px,1.15vw,12px);font-weight:800;color:#38465a}.cell:nth-child(4n+1),.cell:nth-child(4n+2){background:#f7efdE}.cell:nth-child(4n+3),.cell:nth-child(4n){background:#e6f1ec}.cell.start{background:#ccebd9}.cell.finish{background:#f4dfad}.cell .number{position:relative;z-index:2}.cell .mark{position:absolute;right:1px;bottom:0;font-size:clamp(9px,1.8vw,17px);line-height:1}
+.connections,.tokens{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.connections{z-index:3}.tokens{z-index:4}.token{position:absolute;width:clamp(13px,2.2vw,22px);height:clamp(13px,2.2vw,22px);border:2px solid #fff;border-radius:50%;box-shadow:0 2px 5px #17243a70;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:900}
+.sidebar{display:grid;gap:14px}.section-title{font-size:15px;font-weight:850;margin:0 0 12px;letter-spacing:.01em}.step-label{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:850;color:#45546a;margin:14px 0 7px}.step-number{display:inline-grid;place-items:center;width:21px;height:21px;border-radius:7px;background:#edf0f3;color:#42536b;font-size:11px}
+.field{width:100%;min-height:45px;border:1px solid #d8dde5;border-radius:11px;background:#fff;padding:10px 12px;color:#1c2a40}.field:focus{border-color:#b78b45}.hint{font-size:11px;color:var(--muted);margin:6px 1px 0;line-height:1.4}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mode-card{background:#fff;border:1.5px solid #dfe3e8;border-radius:13px;padding:11px 10px;text-align:left;color:var(--ink);min-height:76px;transition:border-color .15s,background .15s}.mode-card[aria-pressed=true]{border-color:#a77b38;background:#f8f1e5;box-shadow:inset 0 0 0 1px #a77b38}.mode-icon{font-size:20px;display:block;margin-bottom:5px}.mode-card strong{display:block;font-size:12px}.mode-card small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.board-options{display:grid;grid-template-columns:1fr 1fr;gap:8px}.board-choice{border:1.5px solid #dfe3e8;background:#fff;border-radius:12px;padding:10px;text-align:left;min-height:65px;color:var(--ink)}.board-choice[aria-pressed=true]{border-color:#a77b38;background:#f8f1e5;box-shadow:inset 0 0 0 1px #a77b38}.board-choice strong{display:block;font-size:12px}.board-choice small{display:block;font-size:11px;color:var(--muted);margin-top:3px}
+.player-counts{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.count-btn{padding:9px 2px;border:1px solid #dfe3e8;border-radius:9px;background:#fff;font-size:13px;font-weight:800;color:#40516a}.count-btn[aria-pressed=true]{background:#203653;color:#fff;border-color:#203653}
+.name-field{margin-top:12px}.primary{width:100%;margin-top:16px;background:linear-gradient(135deg,#203653,#14213d);color:#fff;border:0;border-radius:12px;padding:13px 16px;min-height:48px;font-weight:850;box-shadow:0 5px 12px #14213d25}.primary:hover{filter:brightness(1.12)}
+button{transition:transform .16s ease,filter .16s ease,box-shadow .16s ease}button:active:not(:disabled){transform:scale(.975)}
+.dice.rolling{animation:diceTumble .72s cubic-bezier(.2,.75,.25,1)}
+@keyframes diceTumble{0%{transform:translateY(0) rotate(0) scale(1)}25%{transform:translateY(-9px) rotate(100deg) scale(1.08)}55%{transform:translateY(2px) rotate(260deg) scale(.96)}100%{transform:translateY(0) rotate(360deg) scale(1)}}
+.token{transition:left .16s ease,top .16s ease,margin .16s ease}
+.status.victory{background:#fff5d9;border-color:#d5a64e;animation:victoryPulse .7s ease-in-out 2}
+@keyframes victoryPulse{50%{transform:scale(1.015);box-shadow:0 0 0 5px #e7c77b55}}
+.utility-row{display:flex;gap:8px;margin-top:8px}.utility-row .secondary{margin-top:0;flex:1}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+.game-panel{padding:15px}.game-top{display:flex;justify-content:space-between;align-items:center;gap:8px}.turn-label{font-size:12px;color:var(--muted);font-weight:700}.players{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:11px 0}.player{display:flex;align-items:center;gap:7px;padding:8px 9px;background:#fff;border:1.5px solid #e5e8ec;border-radius:10px;min-width:0}.player.active{border-color:#398b78;background:#edf7f2}.dot{width:13px;height:13px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 3px #0004;flex:none}.player b{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.player small{margin-left:auto;font-size:10px;color:var(--muted);white-space:nowrap}
+.dice-box{display:grid;place-items:center;background:#f3f0e9;border:1px solid #e9e2d5;border-radius:14px;padding:9px;margin:10px 0}.dice{font-size:45px;line-height:1.1}.dice-caption{font-size:10px;color:var(--muted);font-weight:750;letter-spacing:.08em;text-transform:uppercase;margin-top:4px}
+.status{background:#eef2f6;border:1px solid #e1e7ed;border-radius:11px;padding:11px;font-size:12px;line-height:1.45;font-weight:700;min-height:48px}.roll{width:100%;margin-top:9px;background:#c99a4e;color:#241b10;border:0;border-radius:11px;min-height:46px;font-weight:900}.roll:disabled{opacity:.45;cursor:not-allowed}.secondary{width:100%;margin-top:8px;background:#fff;border:1px solid #dfe3e8;color:#34445b;border-radius:11px;min-height:42px;font-weight:750}
+.log{max-height:142px;overflow:auto;background:#fff;border:1px solid #e6e9ed;border-radius:10px;padding:8px;margin-top:10px;font-size:11px;line-height:1.45}.log div{padding:4px 2px;border-bottom:1px solid #f0f1f3}.rules{font-size:11px;color:#657186;line-height:1.55;margin-top:10px}.footer{text-align:center;color:#c9d3df;font-size:11px;margin:15px 0 0}
+@media(max-width:850px){.workspace{grid-template-columns:1fr}.shell{padding:max(14px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}.surface{padding:12px}.board-wrap{max-width:690px}}
+@media(max-width:390px){.player-counts{gap:4px}.count-btn{font-size:12px}.board-choice{padding:8px}.board-choice strong{font-size:11px}.surface{border-radius:15px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="brand"><div class="eyebrow">The timeless board game</div><h1>Snakes &amp; Ladders</h1><p>Choose your game. Roll the dice. Climb to victory.</p></header>
+<main class="workspace">
+<section class="surface">
+ <div class="board-head"><div><div class="board-title" id="boardTitle">Standard Board</div><div class="board-subtitle" id="boardSubtitle">100 squares · Classic layout</div></div><span class="badge" id="boardBadge">100 SQUARES</span></div>
+ <div class="board-wrap" id="boardWrap"><div class="board" id="board" aria-label="Snakes and ladders game board"></div><svg class="connections" id="connections" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true"></svg><div class="tokens" id="tokens"></div></div>
+</section>
+<aside class="sidebar">
+<section class="surface">
+ <h2 class="section-title">Set up your game</h2>
+ <div class="step-label"><span class="step-number">1</span> Choose game mode</div>
+ <div class="mode-grid">
+  <button type="button" class="mode-card" data-mode="computer" aria-pressed="true"><span class="mode-icon">🤖</span><strong>Play vs Computer</strong><small>Solo against the computer</small></button>
+  <button type="button" class="mode-card" data-mode="local" aria-pressed="false"><span class="mode-icon">👥</span><strong>Local Multiplayer</strong><small>Pass and play together</small></button>
+ </div>
+ <div id="countArea">
+  <div class="step-label"><span class="step-number">2</span> Number of local players</div>
+  <div class="player-counts" id="playerCounts">
+   <button type="button" class="count-btn" data-count="1" aria-pressed="false">1</button><button type="button" class="count-btn" data-count="2" aria-pressed="true">2</button><button type="button" class="count-btn" data-count="3" aria-pressed="false">3</button><button type="button" class="count-btn" data-count="4" aria-pressed="false">4</button><button type="button" class="count-btn" data-count="5" aria-pressed="false">5</button><button type="button" class="count-btn" data-count="6" aria-pressed="false">6</button>
+  </div>
+ </div>
+ <div class="step-label"><span class="step-number">3</span> Choose board size</div>
+ <div class="board-options" id="boardOptions">
+  <button type="button" class="board-choice" data-size="50" aria-pressed="false"><strong>Small Board</strong><small>50 squares</small></button>
+  <button type="button" class="board-choice" data-size="100" aria-pressed="true"><strong>Standard Board</strong><small>100 squares</small></button>
+  <button type="button" class="board-choice" data-size="150" aria-pressed="false"><strong>Extended Board</strong><small>150 squares</small></button>
+  <button type="button" class="board-choice" data-size="200" aria-pressed="false"><strong>Large Board</strong><small>200 squares</small></button>
+  <button type="button" class="board-choice" data-size="250" aria-pressed="false"><strong>Extra Large Board</strong><small>250 squares</small></button>
+ </div>
+ <label class="step-label" for="playerName"><span class="step-number">4</span> Player name</label>
+ <input class="field name-field" id="playerName" maxlength="20" value="Player 1" autocomplete="off" aria-label="Your or first player's name">
+ <p class="hint" id="modeHint">In solo mode, you play against one computer opponent.</p>
+ <button type="button" class="primary" id="start">Start New Game</button>
+</section>
+<section class="surface game-panel">
+ <div class="game-top"><h2 class="section-title" style="margin:0">Game in progress</h2><span class="badge" id="turnBadge">READY</span></div>
+ <div class="players" id="players"></div>
+ <div class="dice-box"><div class="dice" id="dice">⚄</div><div class="dice-caption">Dice result</div></div>
+ <div class="status" id="status" aria-live="polite">Choose your settings, then start a new game.</div>
+ <button type="button" class="roll" id="roll" disabled>Roll the Dice</button>
+ <div class="utility-row"><button type="button" class="secondary" id="newGame">New Game / Change Settings</button><button type="button" class="secondary" id="soundToggle" aria-pressed="true" aria-label="Turn sound off">🔊 Sound ON</button></div>
+ <div class="log" id="log" aria-label="Game history"></div>
+ <div class="rules"><b>How to play:</b> Roll a 6 to enter the board. Land on a ladder to climb up or a snake to slide down. Reach the final square with an exact roll to win. Rolling a 6 grants another turn. Computer turns play automatically.</div>
+</section>
+</aside>
+</main>
+<footer class="footer">Standalone offline game · No accounts · No ads · No external APIs or libraries</footer>
+</div>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const sizes={50:'Small Board',100:'Standard Board',150:'Extended Board',200:'Large Board',250:'Extra Large Board'};
+const colors=['#d84b50','#277da1','#8058b8','#d18a2e','#25815d','#b34d85'];
+const diceFaces=['⚀','⚁','⚂','⚃','⚄','⚅'];
+const snakeBase={98:78,95:75,92:88,83:63,73:53,69:49,64:60,59:39,55:33,52:42,48:16,46:25};
+const ladderBase={2:23,8:34,20:77,32:68,41:79,50:91,63:81,71:93};
+let mode='computer',localCount=2,boardSize=100,activeSize=100,rows=10,snakes={},ladders={},players=[],turn=0,locked=true,finished=false,computerTimer=null,turnTimer=null,gameStarted=false,gameEpoch=0,soundOn=true,audioContext=null;
+function scaledConnections(source,total,forbiddenFrom,forbiddenTo){
+ const out={},usedDest=new Set();
+ for(const [key,value] of Object.entries(source)){
+  const from=Math.round((Number(key)-1)*(total-1)/99)+1;
+  const to=Math.round((value-1)*(total-1)/99)+1;
+  if(from>1&&from<total&&to>1&&to<total&&from!==to&&!out[from]&&!usedDest.has(to)&&!usedDest.has(from)&&!out[to]&&!forbiddenFrom.has(from)&&!forbiddenTo.has(to)){out[from]=to;usedDest.add(to)}
+ }
+ return out;
+}
+function generateConnections(total){
+ /* Ladders first, then snakes. A square never starts two jumps, and a ladder never ends on a snake head. */
+ const ladderMap=scaledConnections(ladderBase,total,new Set(),new Set());
+ const ladderStarts=new Set(Object.keys(ladderMap).map(Number));
+ const snakeMap=scaledConnections(snakeBase,total,ladderStarts,new Set());
+ for(const [f,t] of Object.entries(ladderMap)){if(snakeMap[t])delete ladderMap[f]}
+ return{ladders:ladderMap,snakes:snakeMap};
+}
+function cellPoint(n){
+ const row=Math.floor((n-1)/10),col=row%2===0?(n-1)%10:9-(n-1)%10;
+ return{x:(col+.5)*100,y:((rows-1-row)+.5)*1000/rows};
+}
+function buildBoard(){
+ rows=Math.ceil(activeSize/10);
+ $('boardWrap').style.aspectRatio=`10 / ${rows}`;
+ const board=$('board');board.innerHTML='';
+ board.style.gridTemplateColumns='repeat(10,minmax(0,1fr))';
+ board.style.gridTemplateRows=`repeat(${rows},minmax(0,1fr))`;
+ const order=[];
+ for(let row=rows-1;row>=0;row--){
+  const first=row*10+1,last=Math.min(row*10+10,activeSize);
+  if(row%2===0){for(let n=first;n<=last;n++)order.push(n)}
+  else{for(let n=last;n>=first;n--)order.push(n)}
+ }
+ for(const n of order){
+  const cell=document.createElement('div');
+  cell.className='cell'+(n===1?' start':'')+(n===activeSize?' finish':'');
+  const number=document.createElement('span');number.className='number';number.textContent=n;cell.append(number);
+  if(snakes[n]||ladders[n]){const mark=document.createElement('span');mark.className='mark';mark.textContent=snakes[n]?'🐍':'🪜';cell.append(mark)}
+  board.append(cell);
+ }
+ $('boardTitle').textContent=sizes[activeSize];
+ $('boardSubtitle').textContent=`${activeSize} squares · Classic layout`;
+ $('boardBadge').textContent=`${activeSize} SQUARES`;
+ drawConnections();
+}
+function drawConnections(){
+ const svg=$('connections');svg.innerHTML='';const ns='http://www.w3.org/2000/svg';
+ for(const [from,to] of Object.entries(ladders)){
+  const a=cellPoint(Number(from)),b=cellPoint(to);
+  for(const offset of [-8,8]){
+   const line=document.createElementNS(ns,'line');
+   line.setAttribute('x1',a.x+offset);line.setAttribute('y1',a.y);
+   line.setAttribute('x2',b.x+offset);line.setAttribute('y2',b.y);
+   line.setAttribute('stroke','#25815d');line.setAttribute('stroke-width','7');line.setAttribute('stroke-linecap','round');svg.append(line);
+  }
+ }
+ for(const [from,to] of Object.entries(snakes)){
+  const a=cellPoint(Number(from)),b=cellPoint(to),path=document.createElementNS(ns,'path');
+  const bend=(Number(from)%2?50:-50);
+  path.setAttribute('d',`M ${a.x} ${a.y} Q ${(a.x+b.x)/2+bend} ${(a.y+b.y)/2-25} ${b.x} ${b.y}`);
+  path.setAttribute('fill','none');path.setAttribute('stroke','#d65b52');path.setAttribute('stroke-width','15');path.setAttribute('stroke-linecap','round');svg.append(path);
+  const head=document.createElementNS(ns,'circle');head.setAttribute('cx',a.x);head.setAttribute('cy',a.y);head.setAttribute('r','14');head.setAttribute('fill','#a83c38');svg.append(head);
+ }
+}
+function renderPlayers(){
+ $('players').innerHTML='';
+ players.forEach((p,i)=>{
+  const item=document.createElement('div');item.className='player'+(i===turn&&!finished?' active':'');
+  const dot=document.createElement('span');dot.className='dot';dot.style.background=p.color;
+  const name=document.createElement('b');name.textContent=p.name;
+  const position=document.createElement('small');position.textContent=p.pos===0?'Start':`${p.pos}/${activeSize}`;
+  item.append(dot,name,position);$('players').append(item);
+ });
+ $('tokens').innerHTML='';
+ const atSquare={};players.forEach((p,i)=>{if(p.pos>0)(atSquare[p.pos]??=[]).push(i)});
+ Object.entries(atSquare).forEach(([square,ids])=>{
+  const point=cellPoint(Number(square));
+  ids.forEach((playerIndex,slot)=>{
+   const token=document.createElement('div');token.className='token';token.style.background=players[playerIndex].color;
+   const angle=(2*Math.PI*slot)/Math.max(ids.length,1);
+   token.style.left=`${point.x/10}%`;token.style.top=`${point.y/10}%`;
+   token.style.marginLeft=`${Math.cos(angle)*12/10}%`;
+   token.style.marginTop=`${Math.sin(angle)*12/rows}%`;
+   token.textContent=playerIndex+1;$('tokens').append(token);
+  });
+ });
+}
+function say(message){$('status').textContent=message}
+function playTone(freq=440,duration=.09,type='sine',volume=.045){
+ if(!soundOn)return;
+ try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;audioContext ||= new AC();if(audioContext.state==='suspended')audioContext.resume();
+ const osc=audioContext.createOscillator(),gain=audioContext.createGain();osc.type=type;osc.frequency.setValueAtTime(freq,audioContext.currentTime);gain.gain.setValueAtTime(volume,audioContext.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioContext.currentTime+duration);osc.connect(gain);gain.connect(audioContext.destination);osc.start();osc.stop(audioContext.currentTime+duration);
+ }catch(_){/* Audio is optional; gameplay never depends on it. */}
+}
+function soundEvent(kind){const patterns={click:[[520,.035]],roll:[[180,.06],[260,.06],[360,.07]],result:[[520,.08],[660,.1]],move:[[390,.045]],ladder:[[440,.08],[590,.09],[760,.12]],snake:[[360,.1],[250,.13],[170,.16]],win:[[523,.12],[659,.12],[784,.16],[1046,.24]]};(patterns[kind]||[]).forEach(([f,d],i)=>setTimeout(()=>playTone(f,d,kind==='snake'?'triangle':'sine'),i*75));}
+const reducedMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches||false;
+function wait(ms){return new Promise(resolve=>setTimeout(resolve,reducedMotion?0:ms));}
+
+function addLog(message){const line=document.createElement('div');line.textContent=message;$('log').prepend(line)}
+function isComputerTurn(){return !!(players[turn]&&players[turn].computer)}
+function updateModeUI(){
+ document.querySelectorAll('[data-mode]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.mode===mode)));
+ $('countArea').hidden=mode!=='local';
+ $('modeHint').textContent=mode==='computer'?'Solo mode: you play against one computer opponent.':'Local mode: take turns on the same device. Choose between 1 and 6 players.';
+}
+function selectMode(value){mode=value;updateModeUI()}
+function selectCount(value){localCount=value;document.querySelectorAll('[data-count]').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.count)===value)))}
+function selectBoard(value){boardSize=value;document.querySelectorAll('[data-size]').forEach(button=>button.setAttribute('aria-pressed',String(Number(button.dataset.size)===value)));if(!gameStarted){activeSize=value;({snakes,ladders}=generateConnections(activeSize));buildBoard()}}
+function clearGameTimers(){clearTimeout(computerTimer);clearTimeout(turnTimer);computerTimer=null;turnTimer=null;gameEpoch++;}
+function startGame(){
+ clearGameTimers();activeSize=boardSize;({snakes,ladders}=generateConnections(activeSize));
+ const firstName=$('playerName').value.trim()||'Player 1';
+ const count=mode==='computer'?2:localCount;
+ players=Array.from({length:count},(_,i)=>({name:i===0?firstName:(mode==='computer'?'Computer':`Player ${i+1}`),pos:0,color:colors[i],computer:mode==='computer'&&i===1}));
+ turn=0;locked=false;finished=false;gameStarted=true;
+ $('dice').textContent='⚄';$('dice').classList.remove('rolling');$('status').classList.remove('victory');$('log').innerHTML='';$('turnBadge').textContent='IN PLAY';
+ buildBoard();renderPlayers();$('roll').disabled=false;
+ say(`${players[0].name}'s turn. Roll a 6 to enter the board.`);
+ addLog(`${mode==='computer'?'Solo game started — you vs Computer.':`Local game started — ${count} player(s).`} ${activeSize}-square ${sizes[activeSize].toLowerCase()}.`);
+}
+function changeSettings(){
+ clearGameTimers();gameStarted=false;$('status').classList.remove('victory');players=[];turn=0;locked=true;finished=false;
+ $('roll').disabled=true;$('turnBadge').textContent='READY';$('players').innerHTML='';$('tokens').innerHTML='';
+ $('dice').textContent='⚄';$('log').innerHTML='';say('Choose your settings, then start a new game.');
+}
+function finishTurn(extraTurn){
+ if(finished)return;
+ if(!extraTurn)turn=(turn+1)%players.length;
+ locked=false;$('roll').disabled=isComputerTurn();
+ $('turnBadge').textContent=isComputerTurn()?'COMPUTER TURN':'IN PLAY';
+ say(`${players[turn].name}'s turn${extraTurn?' — roll again!':'.'}`);
+ renderPlayers();
+ if(isComputerTurn()){
+  locked=true;$('roll').disabled=true;
+  computerTimer=setTimeout(()=>{computerTimer=null;if(!gameStarted||finished||!isComputerTurn())return;locked=false;rollDice()},850);
+ }
+}
+async function rollDice(){
+ if(locked||finished||!gameStarted||!players.length)return;
+ locked=true;$('roll').disabled=true;const epoch=gameEpoch,player=players[turn];
+ soundEvent('roll');const dice=$('dice');dice.classList.remove('rolling');void dice.offsetWidth;dice.classList.add('rolling');
+ if(!reducedMotion){for(let i=0;i<7;i++){dice.textContent=diceFaces[Math.floor(Math.random()*6)];await wait(85);if(epoch!==gameEpoch)return;}}
+ const roll=1+Math.floor(Math.random()*6);dice.textContent=diceFaces[roll-1];dice.classList.remove('rolling');soundEvent('result');
+ let message=`${player.name} rolled ${roll}. `;
+ if(player.pos===0){if(roll===6){player.pos=1;message+='Rolled a 6 and entered square 1.';renderPlayers();soundEvent('move');await wait(170);}else message+='A 6 is needed to enter the board.';}
+ else{
+  const target=player.pos+roll;
+  if(target>activeSize)message+=`Needs an exact roll to reach ${activeSize}; stays on ${player.pos}.`;
+  else{
+   const from=player.pos;
+   for(let square=from+1;square<=target;square++){if(epoch!==gameEpoch)return;player.pos=square;renderPlayers();soundEvent('move');await wait(115);}
+   message+=`Moves to square ${player.pos}.`;
+   if(ladders[player.pos]){const landing=player.pos;message+=` Ladder! Climbs to ${ladders[landing]}.`;soundEvent('ladder');player.pos=ladders[landing];renderPlayers();await wait(360);}
+   else if(snakes[player.pos]){const landing=player.pos;message+=` Snake! Slides to ${snakes[landing]}.`;soundEvent('snake');player.pos=snakes[landing];renderPlayers();await wait(360);}
+  }
+ }
+ if(epoch!==gameEpoch)return;
+ addLog(message);renderPlayers();
+ if(player.pos===activeSize){finished=true;clearTimeout(computerTimer);clearTimeout(turnTimer);$('turnBadge').textContent='GAME OVER';$('roll').disabled=true;$('status').classList.add('victory');say(`🏆 ${player.name} wins! Start a new game to play again.`);addLog(`${player.name} wins the game!`);soundEvent('win');return;}
+ turnTimer=setTimeout(()=>{if(epoch===gameEpoch)finishTurn(roll===6)},reducedMotion?0:220);
+}
+document.querySelectorAll('[data-mode]').forEach(button=>button.addEventListener('click',()=>{soundEvent('click');selectMode(button.dataset.mode)}));
+document.querySelectorAll('[data-count]').forEach(button=>button.addEventListener('click',()=>{soundEvent('click');selectCount(Number(button.dataset.count))}));
+document.querySelectorAll('[data-size]').forEach(button=>button.addEventListener('click',()=>{soundEvent('click');selectBoard(Number(button.dataset.size))}));
+$('start').addEventListener('click',()=>{soundEvent('click');startGame()});
+$('newGame').addEventListener('click',()=>{soundEvent('click');changeSettings()});
+$('soundToggle').addEventListener('click',()=>{soundOn=!soundOn;$('soundToggle').textContent=soundOn?'🔊 Sound ON':'🔇 Sound OFF';$('soundToggle').setAttribute('aria-pressed',String(soundOn));$('soundToggle').setAttribute('aria-label',soundOn?'Turn sound off':'Turn sound on');if(soundOn)soundEvent('click')});
+$('roll').addEventListener('click',()=>{soundEvent('click');rollDice()});
+updateModeUI();selectCount(2);selectBoard(100);
+})();
+</script>
+</body>
+</html>
